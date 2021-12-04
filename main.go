@@ -1,51 +1,65 @@
 package main
 
 import (
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
-	"github.com/go-chi/render"
+	"context"
+	"fmt"
+	"github.com/baqtiste/fizzbuzz/db"
+	"github.com/baqtiste/fizzbuzz/handler"
 	"log"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 )
 
-func Routes() *chi.Mux {
-	router := chi.NewRouter()
+func main() {
+	addr := ":8080"
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("Error occurred: %s", err.Error())
+	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-	})
+	dbUser, dbPassword, dbName :=
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB")
+	database, err := db.Initialize(dbUser, dbPassword, dbName)
 
-	router.Use(
-		c.Handler,
-		render.SetContentType(render.ContentTypeJSON),
-		middleware.Logger,
-		middleware.RedirectSlashes,
-		middleware.Recoverer,
-	)
+	if err != nil {
+		log.Fatalf("Could not set up database: %v", err)
+	}
 
-	//public routes
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		render.Status(r, http.StatusOK)
-		render.JSON(w, r,  fizzbuzz(4, 5, 10000, "hello", "world"))
-	})
+	defer database.Connection.Close()
 
-	return router
+	httpHandler := handler.NewHandler(database)
+	server := &http.Server{Handler: httpHandler}
+
+	go func() {
+		server.Serve(listener)
+	}()
+
+	defer Stop(server)
+
+	log.Printf("Started server on %s", addr)
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Println(fmt.Sprint(<-ch))
+	log.Println("Stopping API server.")
 }
 
-func main() {
-	router := Routes()
-
-	if err := http.ListenAndServe("localhost:8080", router); err != nil {
-		log.Fatalln("Server error:", err.Error())
+func Stop(server *http.Server) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("Could not shut down server correctly: %v\n", err)
+		os.Exit(1)
 	}
 }
 
-func fizzbuzz(int1 int, int2 int, limit int, str1 string, str2 string) string {
+func Fizzbuzz(int1 int, int2 int, limit int, str1 string, str2 string) string {
 	var output string
 
 	for i:=1; i<=limit; i++ {
