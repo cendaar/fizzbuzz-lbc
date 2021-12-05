@@ -1,36 +1,25 @@
 package db
 
 import (
-	"database/sql"
-	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/go-redis/redis"
+	"os"
 )
 
-const (
-	HOST = "database"
-	PORT = 5432
-)
-
-type Database struct {
-	Connection *sql.DB
+type RedisInstance struct {
+	Client *redis.Client
 }
 
-func Initialize(username, password, database string) (Database, error) {
-	db := Database{}
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		HOST, PORT, username, password, database)
+func Initialize() (*RedisInstance, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_URL"),
+		Password: "",
+		DB:       0,
+	})
 
-	conn, err := sql.Open("postgres", dsn)
+	_, err := client.Ping().Result()
 	if err != nil {
-		return db, err
+		return nil, err
 	}
 
-	db.Connection = conn
-	err = db.Connection.Ping()
-
-	if err != nil {
-		return db, err
-	}
-
-	return db, nil
+	return &RedisInstance{Client: client}, nil
 }

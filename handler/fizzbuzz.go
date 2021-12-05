@@ -1,23 +1,32 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/baqtiste/fizzbuzz/models"
+	"github.com/baqtiste/fizzbuzz/services"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"io"
 	"net/http"
 )
 
 func fizzbuzzRoutes(router chi.Router) {
-	router.Get("/", fizzbuzz)
+	router.Post("/", fizzbuzz)
+	router.Get("/", helloworld)
+}
+
+func helloworld(w http.ResponseWriter, r *http.Request) {
+	_, _ = io.WriteString(w, "helloworld")
 }
 
 func fizzbuzz(w http.ResponseWriter, r *http.Request) {
-	fizzbuzz := &models.Fizzbuzz{}
-	if err := render.Bind(r, fizzbuzz); err != nil {
+	fizzbuzzModel := &models.Fizzbuzz{}
+	if err := render.Bind(r, fizzbuzzModel); err != nil {
 		_ = render.Render(w, r, ErrBadRequest)
 		return
 	}
 
-	fmt.Println(fizzbuzz)
+	fizzbuzzService := services.NewFizzbuzzService(redisInstance)
+	output := fizzbuzzService.ComputeFizzbuzz(fizzbuzzModel)
+
+	_, _ = io.WriteString(w, output)
 }

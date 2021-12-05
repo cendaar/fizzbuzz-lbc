@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 )
@@ -22,19 +21,12 @@ func main() {
 		log.Fatalf("Error occurred: %s", err.Error())
 	}
 
-	dbUser, dbPassword, dbName :=
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		os.Getenv("POSTGRES_DB")
-	database, err := db.Initialize(dbUser, dbPassword, dbName)
-
+	client, err := db.Initialize()
 	if err != nil {
-		log.Fatalf("Could not set up database: %v", err)
+		log.Fatalln(err)
 	}
 
-	defer database.Connection.Close()
-
-	httpHandler := handler.NewHandler(database)
+	httpHandler := handler.NewHandler(client)
 	server := &http.Server{Handler: httpHandler}
 
 	go func() {
@@ -57,27 +49,4 @@ func Stop(server *http.Server) {
 		log.Printf("Could not shut down server correctly: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-func Fizzbuzz(int1 int, int2 int, limit int, str1 string, str2 string) string {
-	var output string
-
-	for i:=1; i<=limit; i++ {
-		switch {
-		case i % (int1*int2) == 0:
-			output += str1+str2
-		case i % int1 == 0:
-			output += str1
-		case i % int2 == 0:
-			output += str2
-		default:
-			output += strconv.Itoa(i)
-		}
-
-		if i != limit {
-			output += ","
-		}
-	}
-
-	return output
 }

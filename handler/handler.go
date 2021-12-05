@@ -9,10 +9,10 @@ import (
 	"net/http"
 )
 
-var dbInstance db.Database
+var redisInstance *db.RedisInstance
 
-func NewHandler(db db.Database) http.Handler {
-	dbInstance = db
+func NewHandler(ri *db.RedisInstance) http.Handler {
+	redisInstance = ri
 	router := chi.NewRouter()
 
 	c := cors.New(cors.Options{
