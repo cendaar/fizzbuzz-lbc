@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/baqtiste/fizzbuzz/db"
-	"github.com/baqtiste/fizzbuzz/handler"
+	"github.com/cendaar/fizzbuzz/db"
+	"github.com/cendaar/fizzbuzz/handler"
 	"log"
 	"net"
 	"net/http"
@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	addr := fmt.Sprint(":", os.Getenv("PORT"))
+	addr := ":" + os.Getenv("PORT")
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("Error occurred: %s", err.Error())
@@ -30,7 +30,7 @@ func main() {
 	server := &http.Server{Handler: httpHandler}
 
 	go func() {
-		server.Serve(listener)
+		_ = server.Serve(listener)
 	}()
 
 	defer Stop(server)

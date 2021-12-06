@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/baqtiste/fizzbuzz/db"
+	"github.com/cendaar/fizzbuzz/db"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -31,11 +31,11 @@ func NewHandler(ri *db.RedisInstance) http.Handler {
 
 func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(405)
+	w.WriteHeader(ErrMethodNotAllowed.StatusCode)
 	_ = render.Render(w, r, ErrMethodNotAllowed)
 }
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	w.WriteHeader(400)
+	w.WriteHeader(ErrNotFound.StatusCode)
 	_ = render.Render(w, r, ErrNotFound)
 }

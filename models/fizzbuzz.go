@@ -5,7 +5,6 @@ import (
 )
 
 type Fizzbuzz struct {
-	ID 		int		`json:"id,omitempty"`
 	Int1 	int		`json:"int1,omitempty"`
 	Int2	int		`json:"int2,omitempty"`
 	Limit	int		`json:"limit,omitempty"`

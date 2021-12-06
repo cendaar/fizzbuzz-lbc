@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/baqtiste/fizzbuzz/models"
-	"github.com/baqtiste/fizzbuzz/services"
+	"github.com/cendaar/fizzbuzz/models"
+	"github.com/cendaar/fizzbuzz/services"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"io"
@@ -28,5 +28,5 @@ func fizzbuzz(w http.ResponseWriter, r *http.Request) {
 	fizzbuzzService := services.NewFizzbuzzService(redisInstance)
 	output := fizzbuzzService.ComputeFizzbuzz(fizzbuzzModel)
 
-	_, _ = io.WriteString(w, output)
+	render.PlainText(w, r, output)
 }

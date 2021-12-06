@@ -6,10 +6,9 @@ import (
 )
 
 type ErrorResponse struct {
-	Err error 				`json:"-"`
-	StatusCode int 			`json:"-"`
-	StatusText string 		`json:"status_text"`
-	Message string 			`json:"message"`
+	StatusCode int 			`json:"code,omitempty"`
+	StatusText string 		`json:"status,omitempty"`
+	Message string 			`json:"error,omitempty"`
 }
 
 var (
@@ -21,22 +20,4 @@ var (
 func (e *ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, e.StatusCode)
 	return nil
-}
-
-func ErrorRenderer(err error) *ErrorResponse {
-	return &ErrorResponse{
-		Err: err,
-		StatusCode: 400,
-		StatusText: "Bad request",
-		Message: err.Error(),
-	}
-}
-
-func ServerErrorRenderer(err error) *ErrorResponse {
-	return &ErrorResponse{
-		Err: err,
-		StatusCode: 500,
-		StatusText: "Internal server error",
-		Message: err.Error(),
-	}
 }

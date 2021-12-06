@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/baqtiste/fizzbuzz/db"
-	"github.com/baqtiste/fizzbuzz/models"
+	"github.com/cendaar/fizzbuzz/db"
+	"github.com/cendaar/fizzbuzz/models"
 	"strconv"
 )
 
