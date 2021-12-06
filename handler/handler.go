@@ -25,6 +25,7 @@ func NewHandler(ri *db.RedisInstance) http.Handler {
 	router.NotFound(notFoundHandler)
 
 	router.Route("/", fizzbuzzRoutes)
+	router.Route("/stats", statsRoutes)
 
 	return router
 }

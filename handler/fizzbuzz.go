@@ -6,27 +6,36 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"io"
+	"log"
 	"net/http"
 )
 
 func fizzbuzzRoutes(router chi.Router) {
 	router.Post("/", fizzbuzz)
-	router.Get("/", helloworld)
+	router.Get("/", hello)
 }
 
-func helloworld(w http.ResponseWriter, r *http.Request) {
+func hello(w http.ResponseWriter, r *http.Request) {
 	_, _ = io.WriteString(w, "helloworld")
 }
 
 func fizzbuzz(w http.ResponseWriter, r *http.Request) {
 	fizzbuzzModel := &models.Fizzbuzz{}
+
 	if err := render.Bind(r, fizzbuzzModel); err != nil {
-		_ = render.Render(w, r, ErrBadRequest)
+		_ = render.Render(w, r, ErrorRenderer(err))
 		return
 	}
 
-	fizzbuzzService := services.NewFizzbuzzService(redisInstance)
+	fizzbuzzService := services.NewFizzbuzzService()
 	output := fizzbuzzService.ComputeFizzbuzz(fizzbuzzModel)
+
+	statsService := services.NewStatsService(redisInstance)
+	err := statsService.HandleFizzbuzzRequest(fizzbuzzModel)
+	if err != nil {
+		_ = render.Render(w, r, ServerErrorRenderer(err))
+		log.Fatalln(err)
+	}
 
 	render.PlainText(w, r, output)
 }

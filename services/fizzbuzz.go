@@ -1,17 +1,15 @@
 package services
 
 import (
-	"github.com/cendaar/fizzbuzz/db"
 	"github.com/cendaar/fizzbuzz/models"
 	"strconv"
 )
 
 type FizzbuzzService struct {
-	RedisInstance *db.RedisInstance
 }
 
-func NewFizzbuzzService(ri *db.RedisInstance) *FizzbuzzService {
-	return &FizzbuzzService{RedisInstance: ri}
+func NewFizzbuzzService() *FizzbuzzService {
+	return &FizzbuzzService{}
 }
 
 func (fs *FizzbuzzService) ComputeFizzbuzz(fb *models.Fizzbuzz) string {
