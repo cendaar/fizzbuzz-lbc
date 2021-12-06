@@ -36,12 +36,12 @@ func (sr *StatsRepository) GetRequestLeader(ctx context.Context) (*string, int, 
 		return nil, 0, err
 	}
 
-	score, err := sr.redis.Client.ZMScore(ctx, keyRequestLeaderboard, members[0]).Result()
+	score, err := sr.redis.Client.ZScore(ctx, keyRequestLeaderboard, members[0]).Result()
 	if err != nil {
 		return nil, 0, err
 	}
 
-	return &requestLeader, int(score[0]), nil
+	return &requestLeader, int(score), nil
 }
 
 func (sr *StatsRepository) getJSONRequestFromHashkey(ctx context.Context, hashkey string) (string, error) {
