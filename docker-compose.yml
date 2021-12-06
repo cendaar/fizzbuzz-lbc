@@ -8,6 +8,7 @@ services:
     environment: # Pass environment variables to the service
       REDIS_URL: "redis:6379"
       REDIS_PASS: ""
+      PORT: 8080
     restart: unless-stopped
     depends_on:
       - redis

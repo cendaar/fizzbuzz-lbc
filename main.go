@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	addr := ":8080"
+	addr := fmt.Sprint(":", os.Getenv("PORT"))
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("Error occurred: %s", err.Error())
