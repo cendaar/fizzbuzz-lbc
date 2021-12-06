@@ -4,7 +4,6 @@ import (
 	"github.com/baqtiste/fizzbuzz/db"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"net/http"
 )
@@ -15,15 +14,7 @@ func NewHandler(ri *db.RedisInstance) http.Handler {
 	redisInstance = ri
 	router := chi.NewRouter()
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-	})
-
 	router.Use(
-		c.Handler,
 		render.SetContentType(render.ContentTypeJSON),
 		middleware.Logger,
 		middleware.RedirectSlashes,
@@ -32,10 +23,12 @@ func NewHandler(ri *db.RedisInstance) http.Handler {
 
 	router.MethodNotAllowed(methodNotAllowedHandler)
 	router.NotFound(notFoundHandler)
+
 	router.Route("/", fizzbuzzRoutes)
 
 	return router
 }
+
 func methodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(405)

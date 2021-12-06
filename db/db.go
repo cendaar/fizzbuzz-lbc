@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/go-redis/redis"
+	"log"
 	"os"
 )
 
@@ -12,9 +13,11 @@ type RedisInstance struct {
 func Initialize() (*RedisInstance, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_URL"),
-		Password: "",
+		Password: os.Getenv("REDIS_PASS"),
 		DB:       0,
 	})
+
+	log.Println(os.Getenv("REDIS_URL"))
 
 	_, err := client.Ping().Result()
 	if err != nil {

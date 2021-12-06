@@ -14,22 +14,22 @@ func NewFizzbuzzService(ri *db.RedisInstance) *FizzbuzzService {
 	return &FizzbuzzService{RedisInstance: ri}
 }
 
-func (fs *FizzbuzzService) ComputeFizzbuzz(mfb *models.Fizzbuzz) string {
+func (fs *FizzbuzzService) ComputeFizzbuzz(fb *models.Fizzbuzz) string {
 	var output string
 
-	for i := 1; i <= mfb.Limit; i++ {
+	for i := 1; i <= fb.Limit; i++ {
 		switch {
-		case i % (mfb.Int1 * mfb.Int2) == 0:
-			output += mfb.Str1 + mfb.Str2
-		case i % mfb.Int1 == 0:
-			output += mfb.Str1
-		case i % mfb.Int2 == 0:
-			output += mfb.Str2
+		case i % (fb.Int1 * fb.Int2) == 0:
+			output += fb.Str1 + fb.Str2
+		case i % fb.Int1 == 0:
+			output += fb.Str1
+		case i % fb.Int2 == 0:
+			output += fb.Str2
 		default:
 			output += strconv.Itoa(i)
 		}
 
-		if i != mfb.Limit {
+		if i != fb.Limit {
 			output += ","
 		}
 	}
