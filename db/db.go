@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/go-redis/redis"
-	"log"
+	"context"
+	"github.com/go-redis/redis/v8"
 	"os"
 )
 
@@ -17,9 +17,7 @@ func Initialize() (*RedisInstance, error) {
 		DB:       0,
 	})
 
-	log.Println(os.Getenv("REDIS_URL"))
-
-	_, err := client.Ping().Result()
+	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
 		return nil, err
 	}
